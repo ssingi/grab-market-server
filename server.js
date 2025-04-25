@@ -95,20 +95,21 @@ app.post("/image", upload.single("image"), (req, res) => {
 // 회원가입
 app.post("/register", async (req, res) => {
   try {
-    const { username, password, email } = req.body;
+    const { userID, password, email } = req.body; // userID로 변경
 
-    if (!username || !password || !email) {
+    if (!userID || !password || !email) {
+      // userID로 변경
       return res.status(400).send("모든 필드를 입력해주세요!");
     }
 
-    const existingUser = await models.User.findOne({ where: { username } });
+    const existingUser = await models.User.findOne({ where: { userID } }); // userID로 변경
     if (existingUser) {
       return res.status(400).send("이미 존재하는 사용자입니다.");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await models.User.create({
-      username,
+      userID, // userID로 변경
       password: hashedPassword,
       email,
     });
@@ -123,10 +124,10 @@ app.post("/register", async (req, res) => {
 // 로그인
 app.post("/login", async (req, res) => {
   try {
-    const { username, password } = req.body;
-    console.log("로그인 요청 데이터:", { username, password });
+    const { userID, password } = req.body; // userID로 변경
+    console.log("로그인 요청 데이터:", { userID, password });
 
-    const user = await models.User.findOne({ where: { username } });
+    const user = await models.User.findOne({ where: { userID } }); // userID로 변경
     if (!user) {
       return res.status(401).send("존재하지 않는 사용자입니다.");
     }
@@ -142,7 +143,7 @@ app.post("/login", async (req, res) => {
       message: "로그인 성공",
       user: {
         id: user.id,
-        username: user.username,
+        userID: user.userID, // userID로 변경
         email: user.email,
       },
     });

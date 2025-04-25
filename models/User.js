@@ -1,6 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
   return sequelize.define("User", {
-    username: {
+    userID: {
+      // 변경된 속성 이름
       type: DataTypes.STRING(30),
       allowNull: false,
       unique: true,
