@@ -3,9 +3,7 @@ const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const multer = require("multer");
 const models = require("./models");
-
 const app = express();
-const port = 8080;
 
 // Multer 설정
 const upload = multer({
@@ -19,6 +17,8 @@ const upload = multer({
   }),
 });
 
+const port = 8080;
+
 // 미들웨어 설정
 app.use(express.json());
 app.use(
@@ -30,13 +30,31 @@ app.use(
 );
 app.use("/uploads", express.static("uploads"));
 
+app.get("/banners", (req, res) => {
+  models.Banner.findAll({
+    limit: 2,
+  })
+    .then((result) => {
+      res.send({
+        banners: result,
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(500).send("베너에서 에러가 발생했습니다.");
+    });
+});
+
 // 상품 목록 조회
 app.get("/products", (req, res) => {
   models.Product.findAll({
     order: [["createdAt", "DESC"]],
     attributes: ["id", "name", "price", "createdAt", "seller", "imageUrl"],
   })
-    .then((result) => res.send({ product: result }))
+    .then((result) => {
+      console.log("PRODUCTS : ", result);
+      res.send({ products: result });
+    })
     .catch((error) => {
       console.error(error);
       res.status(400).send("서버 내부 에러");
@@ -69,7 +87,7 @@ app.post("/products", (req, res) => {
 // 특정 상품 조회
 app.get("/products/:id", (req, res) => {
   const { id } = req.params;
-  models.Product.findOne({ where: { id } })
+  models.Product.findOne({ where: { id: id } })
     .then((result) => {
       console.log("PRODUCT : ", result);
       res.send({ product: result });
