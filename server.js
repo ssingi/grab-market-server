@@ -1,21 +1,14 @@
 const express = require("express");
 const cors = require("cors");
-const bcrypt = require("bcryptjs");
-const multer = require("multer");
 const models = require("./models");
-const app = express();
 
-// Multer 설정
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, "uploads/");
-    },
-    filename: function (req, file, cb) {
-      cb(null, file.originalname);
-    },
-  }),
-});
+const registerRoutes = require("./routes/register"); // auth.js 경로 수정
+const uploadRoutes = require("./routes/upload"); // upload.js 경로 수정
+const productRoutes = require("./routes/product"); // product.js 경로 수정
+const loginRoutes = require("./routes/login"); // login.js 경로 수정
+const purchaseRoutes = require("./routes/purchase"); // purchase.js 경로 수정
+
+const app = express();
 
 const port = 8080;
 
@@ -45,174 +38,12 @@ app.get("/banners", (req, res) => {
     });
 });
 
-// 상품 목록 조회
-app.get("/products", (req, res) => {
-  models.Product.findAll({
-    order: [["createdAt", "DESC"]],
-    attributes: [
-      "id",
-      "name",
-      "price",
-      "createdAt",
-      "seller",
-      "imageUrl",
-      "quantity",
-    ],
-  })
-    .then((result) => {
-      console.log("PRODUCTS : ", result);
-      res.send({ products: result });
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(400).send("서버 내부 에러");
-    });
-});
+app.use("/login", loginRoutes); // auth.js 경로 수정
+app.use("/register", registerRoutes); // register.js 경로 수정
+app.use("/product", productRoutes); // product.js 경로 수정
+app.use("/image", uploadRoutes); // upload.js 경로 수정
+app.use("/purchase", purchaseRoutes); // purchase.js 경로 수정
 
-// 상품 생성
-app.post("/products", (req, res) => {
-  const { name, description, price, seller, imageUrl, quantity } = req.body;
-
-  if (!name || !description || !price || !seller || !imageUrl || !quantity) {
-    return res.status(400).send("모든 필드를 입력해주세요!");
-  }
-
-  if (isNaN(price)) {
-    return res.status(400).send("가격은 숫자여야 합니다.");
-  }
-
-  models.Product.create({
-    name,
-    description,
-    price,
-    seller,
-    imageUrl,
-    quantity,
-  })
-    .then((result) => {
-      console.log("상품 생성 결과: ", result);
-      res.send({ result });
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(400).send("상품 업로드에 문제가 발생했습니다.");
-    });
-});
-
-// 특정 상품 조회
-app.get("/products/:id", (req, res) => {
-  const { id } = req.params;
-  models.Product.findOne({ where: { id: id } })
-    .then((result) => {
-      console.log("PRODUCT : ", result);
-      res.send({ product: result });
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(400).send("상품 조회에 에러가 발생했습니다.");
-    });
-});
-
-// 이미지 업로드
-app.post("/image", upload.single("image"), (req, res) => {
-  const file = req.file;
-
-  if (!file) {
-    return res.status(400).send("이미지 업로드 실패");
-  }
-
-  console.log(file);
-  res.send({ imageUrl: file.path });
-});
-
-// 회원가입
-app.post("/register", async (req, res) => {
-  try {
-    const { userID, password, email } = req.body; // userID로 변경
-
-    if (!userID || !password || !email) {
-      // userID로 변경
-      return res.status(400).send("모든 필드를 입력해주세요!");
-    }
-
-    const existingUser = await models.User.findOne({ where: { userID } }); // userID로 변경
-    if (existingUser) {
-      return res.status(400).send("이미 존재하는 사용자입니다.");
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await models.User.create({
-      userID, // userID로 변경
-      password: hashedPassword,
-      email,
-    });
-
-    res.status(201).send({ message: "회원가입 완료", user: newUser });
-  } catch (error) {
-    console.error("회원가입 오류:", error);
-    res.status(500).send("회원가입 중 오류가 발생했습니다.");
-  }
-});
-
-// 로그인
-app.post("/login", async (req, res) => {
-  try {
-    const { userID, password } = req.body; // userID로 변경
-    console.log("로그인 요청 데이터:", { userID, password });
-
-    const user = await models.User.findOne({ where: { userID } }); // userID로 변경
-    if (!user) {
-      return res.status(401).send("존재하지 않는 사용자입니다.");
-    }
-
-    const isValid = await bcrypt.compare(password, user.password);
-    console.log("비밀번호 검증 결과:", isValid);
-
-    if (!isValid) {
-      return res.status(401).send("잘못된 비밀번호입니다.");
-    }
-
-    res.send({
-      message: "로그인 성공",
-      user: {
-        id: user.id,
-        userID: user.userID, // userID로 변경
-        email: user.email,
-      },
-    });
-  } catch (error) {
-    console.error("로그인 오류:", error);
-    res.status(500).send("로그인 중 오류가 발생했습니다.");
-  }
-});
-
-app.post("/purchase/:id", async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    // 1. 해당 상품 조회
-    const product = await models.Product.findOne({ where: { id } });
-
-    if (!product) {
-      return res.status(404).send("상품을 찾을 수 없습니다.");
-    }
-
-    // 2. 수량 확인
-    if (product.quantity <= 0) {
-      return res.status(400).send("재고가 없습니다.");
-    }
-
-    // 3. 수량 감소
-    await product.update({ quantity: product.quantity - 1 });
-    res.send({
-      result: true,
-      message: "구매 성공! 남은 수량: " + (product.quantity - 1),
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("구매 처리 중 에러 발생");
-  }
-});
 // 서버 실행
 app.listen(port, () => {
   console.log(`서버가 http://localhost:${port} 에서 실행 중입니다.`);
