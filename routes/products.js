@@ -1,5 +1,6 @@
 const express = require("express");
 const models = require("../models");
+const product = require("../models/product");
 
 const router = express.Router();
 
@@ -7,7 +8,14 @@ const router = express.Router();
 router.get("/", (req, res) => {
   models.Product.findAll({
     order: [["createdAt", "DESC"]],
-    attributes: ["id", "name", "price", "createdAt", "seller", "imageUrl"],
+    attributes: [
+      "productID",
+      "name",
+      "price",
+      "createdAt",
+      "seller",
+      "imageUrl",
+    ],
   })
     .then((result) => {
       res.send({ products: result });
@@ -19,9 +27,9 @@ router.get("/", (req, res) => {
 });
 
 // 특정 상품 조회
-router.get("/:id", (req, res) => {
-  const { id } = req.params;
-  models.Product.findOne({ where: { id } })
+router.get("/:productID", (req, res) => {
+  const { productID } = req.params;
+  models.Product.findOne({ where: { productID } })
     .then((result) => {
       res.send({ product: result });
     })
@@ -33,9 +41,9 @@ router.get("/:id", (req, res) => {
 
 // 상품 생성
 router.post("/", (req, res) => {
-  const { name, description, price, seller, imageUrl } = req.body;
+  const { name, description, price, seller, imageUrl, quantity } = req.body;
 
-  if (!name || !description || !price || !seller || !imageUrl) {
+  if (!name || !description || !price || !seller || !imageUrl || !quantity) {
     return res.status(400).send("모든 필드를 입력해주세요!");
   }
 
@@ -43,7 +51,14 @@ router.post("/", (req, res) => {
     return res.status(400).send("가격은 숫자여야 합니다.");
   }
 
-  models.Product.create({ name, description, price, seller, imageUrl })
+  models.Product.create({
+    name,
+    description,
+    price,
+    seller,
+    imageUrl,
+    quantity,
+  })
     .then((result) => {
       res.send({ result });
     })

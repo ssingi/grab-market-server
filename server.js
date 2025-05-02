@@ -1,47 +1,22 @@
 const express = require("express");
-const cors = require("cors");
 const models = require("./models");
+const applyMiddleware = require("./middlewares"); // authMiddleware.js 경로 수정
 
 const registerRoutes = require("./routes/register"); // auth.js 경로 수정
-const uploadRoutes = require("./routes/upload"); // upload.js 경로 수정
-const productRoutes = require("./routes/product"); // product.js 경로 수정
+const productsRoutes = require("./routes/products"); // product.js 경로 수정
 const loginRoutes = require("./routes/login"); // login.js 경로 수정
 const purchaseRoutes = require("./routes/purchase"); // purchase.js 경로 수정
+const bannerRoutes = require("./routes/banners"); // banners.js 경로 수정
 
 const app = express();
-
 const port = 8080;
 
-// 미들웨어 설정
-app.use(express.json());
-app.use(
-  cors({
-    origin: ["http://localhost:3000", "http://localhost:3002"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
-app.use("/uploads", express.static("uploads"));
+applyMiddleware(app); // authMiddleware.js 경로 수정
 
-app.get("/banners", (req, res) => {
-  models.Banner.findAll({
-    limit: 2,
-  })
-    .then((result) => {
-      res.send({
-        banners: result,
-      });
-    })
-    .catch((error) => {
-      console.log(error);
-      res.status(500).send("베너에서 에러가 발생했습니다.");
-    });
-});
-
-app.use("/login", loginRoutes); // auth.js 경로 수정
+app.use("/banners", bannerRoutes); // banners.js 경로 수정
+app.use("/login", loginRoutes); // login.js 경로 수정
 app.use("/register", registerRoutes); // register.js 경로 수정
-app.use("/product", productRoutes); // product.js 경로 수정
-app.use("/image", uploadRoutes); // upload.js 경로 수정
+app.use("/products", productsRoutes); // product.js 경로 수정
 app.use("/purchase", purchaseRoutes); // purchase.js 경로 수정
 
 // 서버 실행

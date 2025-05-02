@@ -4,12 +4,12 @@ const models = require("../models");
 const router = express.Router();
 
 // 상품 구매
-router.post("/:id", async (req, res) => {
-  const { id } = req.params;
+router.post("/:productID", async (req, res) => {
+  const { productID } = req.params;
 
   try {
     // 1. 해당 상품 조회
-    const product = await models.Product.findOne({ where: { id } });
+    const product = await models.Product.findOne({ where: { productID } });
 
     if (!product) {
       return res.status(404).send("상품을 찾을 수 없습니다.");

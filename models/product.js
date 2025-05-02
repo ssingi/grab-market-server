@@ -4,6 +4,7 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
+      autoIncrement: true,
     },
     name: {
       type: DataTypes.STRING(20),
@@ -14,7 +15,7 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    sellerID: {
+    seller: {
       type: DataTypes.STRING(30),
       allowNull: false,
     },
@@ -34,20 +35,14 @@ module.exports = function (sequelize, DataTypes) {
     imageUrl: {
       type: DataTypes.STRING(300),
       allowNull: true,
-      validate: {
-        isUrl: true,
-      },
-    },
-    quantity: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0,
     },
   });
 
+  /*
   product.associate = (models) => {
-    product.belongsTo(models.User, { foreignKey: "sellerID" });
+    product.belongsTo(models.User, { foreignKey: "seller" });
   };
+  */
 
   return product;
 };

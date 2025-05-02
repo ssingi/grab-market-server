@@ -34,10 +34,12 @@ module.exports = (sequelize, DataTypes) => {
     },
   });
 
+  /*
   User.associate = (models) => {
     User.hasMany(models.Blog, { foreignKey: "userID" });
-    User.hasMany(models.Product, { foreignKey: "sellerID" });
+    User.hasMany(models.Product, { foreignKey: "seller" });
   };
+  */
 
   return User;
 };
