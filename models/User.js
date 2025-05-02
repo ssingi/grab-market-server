@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  return sequelize.define("User", {
+  const User = sequelize.define("User", {
     userID: {
       // 변경된 속성 이름
       type: DataTypes.STRING(30),
@@ -14,6 +14,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(50),
       allowNull: false,
       unique: true,
+      validate: {
+        isEmail: true,
+        notEmpty: true,
+        len: [5, 50],
+      },
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -28,4 +33,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
     },
   });
+
+  User.associate = (models) => {
+    User.hasMany(models.Blog, { foreignKey: "userID" });
+    User.hasMany(models.Product, { foreignKey: "sellerID" });
+  };
+
+  return User;
 };

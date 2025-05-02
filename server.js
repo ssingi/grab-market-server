@@ -16,9 +16,9 @@ const port = 8080;
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:3002"], // 클라이언트 도메인
+    origin: ["http://localhost:3000", "http://localhost:3002"],
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true, // 쿠키를 포함한 요청 허용
+    credentials: true,
   })
 );
 app.use("/uploads", express.static("uploads"));
@@ -60,4 +60,4 @@ app.listen(port, () => {
 
 const API_URL = "http://localhost:8080"; // 서버의 포트와 일치하도록 설정
 
-module.exports = { API_URL }; // CommonJS 방식으로 내보내기
+module.exports = { API_URL };
