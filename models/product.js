@@ -1,3 +1,5 @@
+const { toDefaultValue } = require("sequelize/lib/utils");
+
 module.exports = function (sequelize, DataTypes) {
   const product = sequelize.define("Product", {
     name: {
@@ -5,7 +7,7 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false,
     },
     price: {
-      type: DataTypes.INTEGER(10),
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     seller: {
@@ -19,6 +21,11 @@ module.exports = function (sequelize, DataTypes) {
     imageUrl: {
       type: DataTypes.STRING(300),
       allowNull: true,
+    },
+    quantity: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
     },
   });
   return product;
