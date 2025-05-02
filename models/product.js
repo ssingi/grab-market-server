@@ -1,5 +1,3 @@
-const { toDefaultValue } = require("sequelize/lib/utils");
-
 module.exports = function (sequelize, DataTypes) {
   const product = sequelize.define("Product", {
     name: {

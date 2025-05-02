@@ -3,7 +3,6 @@ const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const multer = require("multer");
 const models = require("./models");
-const { where } = require("sequelize");
 const app = express();
 
 // Multer 설정
