@@ -3,6 +3,7 @@ const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const multer = require("multer");
 const models = require("./models");
+const { where } = require("sequelize");
 const app = express();
 
 // Multer 설정
@@ -49,7 +50,15 @@ app.get("/banners", (req, res) => {
 app.get("/products", (req, res) => {
   models.Product.findAll({
     order: [["createdAt", "DESC"]],
-    attributes: ["id", "name", "price", "createdAt", "seller", "imageUrl"],
+    attributes: [
+      "id",
+      "name",
+      "price",
+      "createdAt",
+      "seller",
+      "imageUrl",
+      "quantity",
+    ],
   })
     .then((result) => {
       console.log("PRODUCTS : ", result);
@@ -63,9 +72,9 @@ app.get("/products", (req, res) => {
 
 // 상품 생성
 app.post("/products", (req, res) => {
-  const { name, description, price, seller, imageUrl } = req.body;
+  const { name, description, price, seller, imageUrl, quantity } = req.body;
 
-  if (!name || !description || !price || !seller || !imageUrl) {
+  if (!name || !description || !price || !seller || !imageUrl || !quantity) {
     return res.status(400).send("모든 필드를 입력해주세요!");
   }
 
@@ -73,7 +82,14 @@ app.post("/products", (req, res) => {
     return res.status(400).send("가격은 숫자여야 합니다.");
   }
 
-  models.Product.create({ name, description, price, seller, imageUrl })
+  models.Product.create({
+    name,
+    description,
+    price,
+    seller,
+    imageUrl,
+    quantity,
+  })
     .then((result) => {
       console.log("상품 생성 결과: ", result);
       res.send({ result });
@@ -171,6 +187,33 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.post("/purchase/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // 1. 해당 상품 조회
+    const product = await models.Product.findOne({ where: { id } });
+
+    if (!product) {
+      return res.status(404).send("상품을 찾을 수 없습니다.");
+    }
+
+    // 2. 수량 확인
+    if (product.quantity <= 0) {
+      return res.status(400).send("재고가 없습니다.");
+    }
+
+    // 3. 수량 감소
+    await product.update({ quantity: product.quantity - 1 });
+    res.send({
+      result: true,
+      message: "구매 성공! 남은 수량: " + (product.quantity - 1),
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("구매 처리 중 에러 발생");
+  }
+});
 // 서버 실행
 app.listen(port, () => {
   console.log(`서버가 http://localhost:${port} 에서 실행 중입니다.`);
