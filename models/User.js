@@ -1,5 +1,7 @@
+const { ForeignKeyConstraintError } = require("sequelize");
+
 module.exports = (sequelize, DataTypes) => {
-  return sequelize.define("User", {
+  const User = sequelize.define("User", {
     userID: {
       // 변경된 속성 이름
       type: DataTypes.STRING(30),
@@ -33,4 +35,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
     },
   });
+
+  User.associate = (models) => {
+    User.hasMany(models.Post, { foreignKey: "userID" });
+  };
+
+  User.associate = (models) => {
+    User.hasMany(models.products, { foreignKey: "sellerID" });
+  };
+
+  return User;
 };

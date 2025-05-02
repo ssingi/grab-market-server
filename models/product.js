@@ -34,7 +34,15 @@ module.exports = function (sequelize, DataTypes) {
     imageUrl: {
       type: DataTypes.STRING(300),
       allowNull: true,
+      validate: {
+        isUrl: true,
+      },
     },
   });
+
+  product.associate = (models) => {
+    product.belongsTo(models.User, { foreignKey: "sellerID" });
+  };
+
   return product;
 };
