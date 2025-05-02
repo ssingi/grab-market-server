@@ -1,5 +1,3 @@
-const { ForeignKeyConstraintError } = require("sequelize");
-
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define("User", {
     userID: {
@@ -37,11 +35,8 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   User.associate = (models) => {
-    User.hasMany(models.Post, { foreignKey: "userID" });
-  };
-
-  User.associate = (models) => {
-    User.hasMany(models.products, { foreignKey: "sellerID" });
+    User.hasMany(models.Blog, { foreignKey: "userID" });
+    User.hasMany(models.Product, { foreignKey: "sellerID" });
   };
 
   return User;
