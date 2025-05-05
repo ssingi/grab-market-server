@@ -13,7 +13,7 @@ router.get("/", (req, res) => {
     })
     .catch((error) => {
       console.log(error);
-      res.status(500).send("베너에서 에러가 발생했습니다.");
+      res.status(500).send({ message: "베너에서 에러가 발생했습니다." });
     });
 });
 

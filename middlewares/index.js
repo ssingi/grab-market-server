@@ -34,7 +34,7 @@ module.exports = (app) => {
     const file = req.file;
 
     if (!file) {
-      return res.status(400).send("이미지 업로드 실패");
+      return res.status(400).send({ message: "이미지 업로드 실패" });
     }
 
     console.log(file);

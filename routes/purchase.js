@@ -12,12 +12,12 @@ router.post("/:productID", async (req, res) => {
     const product = await models.Product.findOne({ where: { productID } });
 
     if (!product) {
-      return res.status(404).send("상품을 찾을 수 없습니다.");
+      return res.status(404).send({ message: "상품을 찾을 수 없습니다." });
     }
 
     // 2. 수량 확인
     if (product.quantity <= 0) {
-      return res.status(400).send("재고가 없습니다.");
+      return res.status(400).send({ message: "재고가 없습니다." });
     }
 
     // 3. 수량 감소
@@ -28,7 +28,7 @@ router.post("/:productID", async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).send("구매 처리 중 에러 발생");
+    res.status(500).send({ message: "구매 처리 중 에러 발생" });
   }
 });
 
