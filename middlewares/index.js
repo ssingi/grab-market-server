@@ -1,7 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
+const { CLIENT_ERROR: C_E_CODE } = require("../constants/statusCodes");
 
+/** multer 설정 */
 const upload = multer({
   storage: multer.diskStorage({
     destination: function (req, file, cb) {
@@ -13,6 +15,7 @@ const upload = multer({
   }),
 });
 
+/** 미들웨어 설정 */
 module.exports = (app) => {
   // JSON 파싱 미들웨어
   app.use(express.json());
@@ -34,7 +37,9 @@ module.exports = (app) => {
     const file = req.file;
 
     if (!file) {
-      return res.status(400).send({ message: "이미지 업로드 실패" });
+      return res
+        .status(C_E_CODE.BAD_REQUEST)
+        .send({ message: "이미지 업로드 실패" });
     }
 
     console.log(file);

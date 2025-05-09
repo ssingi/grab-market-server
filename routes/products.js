@@ -1,71 +1,90 @@
 const express = require("express");
-const models = require("../models");
-const product = require("../models/product");
+const { PRODUCT: E_MESSAGES } = require("../constants/errorMessages");
+const {
+  SERVER_ERROR: S_E_CODE,
+  CLIENT_ERROR: C_E_CODE,
+} = require("../constants/statusCodes");
+const {
+  getAllProducts,
+  getProductById,
+  createProduct,
+} = require("../utils/productUtils");
 
 const router = express.Router();
 
 // 상품 목록 조회
-router.get("/", (req, res) => {
-  models.Product.findAll({
-    order: [["createdAt", "DESC"]],
-    attributes: [
-      "productID",
-      "name",
-      "price",
-      "createdAt",
-      "seller",
-      "imageUrl",
-    ],
-  })
-    .then((result) => {
-      res.send({ products: result });
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(400).send({ message: "서버 내부 에러" });
-    });
+router.get("/", async (req, res) => {
+  try {
+    const products = await getAllProducts();
+    // 상품 목록 조회 성공
+    res.send({ products });
+  } catch (error) {
+    // 상품 목록 조회 실패
+    console.error(error);
+    res
+      .status(S_E_CODE.INTERNAL_SERVER_ERROR)
+      .send(E_MESSAGES.INTERNAL_SERVER_ERROR);
+  }
 });
 
 // 특정 상품 조회
-router.get("/:productID", (req, res) => {
-  const { productID } = req.params;
-  models.Product.findOne({ where: { productID } })
-    .then((result) => {
-      res.send({ product: result });
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(400).send({ message: "상품 조회에 에러가 발생했습니다." });
-    });
+router.get("/:productID", async (req, res) => {
+  try {
+    const { productID } = req.params;
+    const product = await getProductById(productID);
+
+    // 상품이 존재하지 않는 경우
+    if (!product) {
+      return res
+        .status(C_E_CODE.BAD_REQUEST)
+        .send(E_MESSAGES.PRODUCT_NOT_FOUND);
+    }
+
+    // 상품 조회 성공
+    res.send({ product });
+  } catch (error) {
+    // 상품 조회 실패
+    console.error(error);
+    res
+      .status(S_E_CODE.INTERNAL_SERVER_ERROR)
+      .send(E_MESSAGES.INTERNAL_SERVER_ERROR);
+  }
 });
 
 // 상품 생성
-router.post("/", (req, res) => {
-  const { name, description, price, seller, imageUrl, quantity } = req.body;
+router.post("/", async (req, res) => {
+  try {
+    const { name, description, price, seller, imageUrl, quantity } = req.body;
 
-  if (!name || !description || !price || !seller || !imageUrl || !quantity) {
-    return res.status(400).send({ message: "모든 필드를 입력해주세요!" });
-  }
+    // 필수 필드 체크
+    if (!name || !description || !price || !seller || !imageUrl || !quantity) {
+      return res.status(C_E_CODE.BAD_REQUEST).send(E_MESSAGES.INVALID_FIELDS);
+    }
 
-  if (isNaN(price)) {
-    return res.status(400).send({ message: "가격은 숫자여야 합니다." });
-  }
+    // 가격이 숫자인지 확인
+    if (isNaN(price)) {
+      return res.status(C_E_CODE.BAD_REQUEST).send(E_MESSAGES.INVALID_PRICE);
+    }
 
-  models.Product.create({
-    name,
-    description,
-    price,
-    seller,
-    imageUrl,
-    quantity,
-  })
-    .then((result) => {
-      res.send({ result });
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(400).send({ message: "상품 업로드에 문제가 발생했습니다." });
+    // 상품 생성
+    const product = await createProduct({
+      name,
+      description,
+      price,
+      seller,
+      imageUrl,
+      quantity,
     });
+
+    // 상품 생성 성공
+    res.send({ product });
+  } catch (error) {
+    // 상품 생성 실패
+    console.error(error);
+    res
+      .status(S_E_CODE.INTERNAL_SERVER_ERROR)
+      .send(E_MESSAGES.PRODUCT_UPLOAD_ERROR);
+  }
 });
 
 module.exports = router;

@@ -1,37 +1,46 @@
 const express = require("express");
-const bcrypt = require("bcrypt");
-const models = require("../models");
+const { LOGIN: E_MESSAGES } = require("../constants/errorMessages");
+const {
+  CLIENT_ERROR: C_E_CODE,
+  SERVER_ERROR: S_E_CODE,
+} = require("../constants/statusCodes");
+const { findUserById, verifyPassword } = require("../utils/userUtils");
 
 const router = express.Router();
 
-// 로그인
+// 로그인 라우터터
 router.post("/", async (req, res) => {
   try {
-    const { userID, password } = req.body; // userID로 변경
+    const { userID, password } = req.body;
     console.log("로그인 요청 데이터:", { userID, password });
 
-    const user = await models.User.findOne({ where: { userID } }); // userID로 변경
+    // 사용자 조회
+    const user = await findUserById(userID);
     if (!user) {
-      return res.status(401).send({ message: "존재하지 않는 사용자입니다." });
+      return res.status(C_E_CODE.UNAUTHORIZED).send(E_MESSAGES.USER_NOT_FOUND);
     }
 
-    const isValid = await bcrypt.compare(password, user.password);
+    // 비밀번호 검증
+    const isValid = await verifyPassword(password, user.password);
     console.log("비밀번호 검증 결과:", isValid);
 
     if (!isValid) {
-      return res.status(401).send({ message: "잘못된 비밀번호입니다." });
+      return res
+        .status(C_E_CODE.UNAUTHORIZED)
+        .send(E_MESSAGES.INVALID_PASSWORD);
     }
 
+    // 로그인 성공
     res.send({
       message: "로그인 성공",
       user: {
         id: user.id,
-        userID: user.userID, // userID로 변경
+        userID: user.userID,
         email: user.email,
       },
     });
   } catch (error) {
-    res.status(500).send({ message: "로그인 중 오류가 발생했습니다." });
+    res.status(S_E_CODE.INTERNAL_SERVER_ERROR).send(E_MESSAGES.LOGIN_ERROR);
   }
 });
 
