@@ -1,5 +1,10 @@
 const express = require("express");
-const models = require("../models");
+const { PURCHASE: ERROR_MESSAGES } = require("../constants/errorMessages");
+const STATUS_CODES = require("../constants/statusCodes");
+const {
+  getProductById,
+  decreaseProductQuantity,
+} = require("../utils/productUtils");
 
 const router = express.Router();
 
@@ -8,27 +13,35 @@ router.post("/:productID", async (req, res) => {
   const { productID } = req.params;
 
   try {
-    // 1. 해당 상품 조회
-    const product = await models.Product.findOne({ where: { productID } });
-
+    // 해당 상품 조회
+    const product = await getProductById(productID);
     if (!product) {
-      return res.status(404).send({ message: "상품을 찾을 수 없습니다." });
+      return res
+        .status(STATUS_CODES.NOT_FOUND)
+        .send(ERROR_MESSAGES.PRODUCT_NOT_FOUND);
     }
 
-    // 2. 수량 확인
-    if (product.quantity <= 0) {
-      return res.status(400).send({ message: "재고가 없습니다." });
-    }
+    // 수량 감소
+    const remainingQuantity = await decreaseProductQuantity(product);
 
-    // 3. 수량 감소
-    await product.update({ quantity: product.quantity - 1 });
+    // 구매 성공
     res.send({
       result: true,
-      message: "구매 성공! 남은 수량: " + (product.quantity - 1),
+      message: `구매 성공! 남은 수량: ${remainingQuantity}`,
     });
   } catch (error) {
+    // 구매 실패
     console.error(error);
-    res.status(500).send({ message: "구매 처리 중 에러 발생" });
+
+    // 재고 부족 에러 처리
+    if (error.message === ERROR_MESSAGES.OUT_OF_STOCK) {
+      return res
+        .status(STATUS_CODES.BAD_REQUEST)
+        .send(ERROR_MESSAGES.OUT_OF_STOCK);
+    }
+
+    // 기타 에러 처리
+    res.status(STATUS_CODES.BAD_REQUEST).send(ERROR_MESSAGES.PURCHASE_ERROR);
   }
 });
 

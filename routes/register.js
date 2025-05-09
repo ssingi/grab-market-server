@@ -1,35 +1,51 @@
 const express = require("express");
-const bcrypt = require("bcrypt");
-const models = require("../models");
+const { REGISTER: ERROR_MESSAGES } = require("../constants/errorMessages");
+const STATUS_CODES = require("../constants/statusCodes");
+const {
+  findUserById,
+  hashPassword,
+  createUser,
+} = require("../utils/userUtils");
 
 const router = express.Router();
 
 // 회원가입
 router.post("/", async (req, res) => {
   try {
-    const { userID, password, email } = req.body; // userID로 변경
+    const { userID, password, email } = req.body;
 
     if (!userID || !password || !email) {
-      // userID로 변경
-      return res.status(400).send({ message: "모든 필드를 입력해주세요!" });
+      return res
+        .status(STATUS_CODES.BAD_REQUEST)
+        .send(ERROR_MESSAGES.MISSING_FIELDS);
     }
 
-    const existingUser = await models.User.findOne({ where: { userID } }); // userID로 변경
+    // 사용자 중복 확인
+    const existingUser = await findUserById(userID);
     if (existingUser) {
-      return res.status(400).send({ message: "이미 존재하는 사용자입니다." });
+      return res
+        .status(STATUS_CODES.BAD_REQUEST)
+        .send(ERROR_MESSAGES.USER_EXISTS);
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await models.User.create({
-      userID, // userID로 변경
+    // 비밀번호 해시 및 사용자 생성
+    const hashedPassword = await hashPassword(password);
+    const newUser = await createUser({
+      userID,
       password: hashedPassword,
       email,
     });
 
-    res.status(201).send({ message: "회원가입 완료", user: newUser });
+    // 회원가입 성공
+    res
+      .status(STATUS_CODES.CREATED)
+      .send({ message: "회원가입 완료", user: newUser });
   } catch (error) {
+    // 회원가입 실패
     console.error("회원가입 오류:", error);
-    res.status(500).send({ message: "회원가입 중 오류가 발생했습니다." });
+    res
+      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .send(ERROR_MESSAGES.REGISTER_ERROR);
   }
 });
 

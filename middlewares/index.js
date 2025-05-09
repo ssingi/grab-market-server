@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
 
+/** multer 설정 */
 const upload = multer({
   storage: multer.diskStorage({
     destination: function (req, file, cb) {
@@ -13,6 +14,7 @@ const upload = multer({
   }),
 });
 
+/** 미들웨어 설정 */
 module.exports = (app) => {
   // JSON 파싱 미들웨어
   app.use(express.json());
