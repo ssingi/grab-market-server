@@ -8,7 +8,7 @@ const { findUserById, verifyPassword } = require("../utils/userUtils");
 
 const router = express.Router();
 
-// 로그인 라우터터
+// 로그인 라우터
 router.post("/", async (req, res) => {
   try {
     const { userID, password } = req.body;
