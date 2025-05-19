@@ -9,6 +9,7 @@ const {
   getProductById,
   createProduct,
 } = require("../utils/productUtils");
+const { findUserById } = require("../utils/userUtils");
 
 const router = express.Router();
 
@@ -40,11 +41,20 @@ router.get("/:productID", async (req, res) => {
         .send(E_MESSAGES.PRODUCT_NOT_FOUND);
     }
 
+    // 판매자 이름 조회
+    const user = await findUserById(product.seller);
+    const sellerName = user ? user.userName : product.seller;
+
     // 상품 조회 성공
-    res.send({ product });
+    res.send({
+      product: {
+        ...product.dataValues,
+        seller: sellerName,
+      },
+    });
   } catch (error) {
     // 상품 조회 실패
-    console.error(error);
+    console.error("에러 발생", error);
     res
       .status(S_E_CODE.INTERNAL_SERVER_ERROR)
       .send(E_MESSAGES.INTERNAL_SERVER_ERROR);
@@ -54,7 +64,8 @@ router.get("/:productID", async (req, res) => {
 // 상품 생성
 router.post("/", async (req, res) => {
   try {
-    const { name, description, price, seller, imageUrl, quantity } = req.body;
+    const { name, description, price, imageUrl, quantity } = req.body;
+    const seller = req.body.userID;
 
     // 필수 필드 체크
     if (!name || !description || !price || !seller || !imageUrl || !quantity) {

@@ -12,9 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     imageUrl: {
       type: DataTypes.STRING(300),
       allowNull: true,
-      validate: {
-        isUrl: true,
-      },
+      validate: { isUrl: true },
     },
     uploadTime: {
       type: DataTypes.DATE,
@@ -26,6 +24,11 @@ module.exports = (sequelize, DataTypes) => {
     userID: {
       type: DataTypes.INTEGER,
       allowNull: false,
+    },
+    postAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
   });
 

@@ -5,12 +5,14 @@ const {
   getProductById,
   decreaseProductQuantity,
 } = require("../utils/productUtils");
+const models = require("../models");
 
 const router = express.Router();
 
 // 상품 구매
 router.post("/:productID", async (req, res) => {
   const { productID } = req.params;
+  const { userID, quantity = 1, deliveryAddress } = req.body;
 
   try {
     // 해당 상품 조회
@@ -21,6 +23,15 @@ router.post("/:productID", async (req, res) => {
 
     // 수량 감소
     const remainingQuantity = await decreaseProductQuantity(product);
+
+    // 구매 정보 저장
+    await models.Purchase.create({
+      userID,
+      productID,
+      quantity,
+      deliveryAddress,
+      purchaseDate: new Date(),
+    });
 
     // 구매 성공
     res.send({
