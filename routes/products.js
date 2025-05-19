@@ -7,44 +7,47 @@ const {
   SERVER_ERROR: S_E_CODE,
   CLIENT_ERROR: C_E_CODE,
 } = require("../constants/statusCodes");
-const {
-  getAllProducts,
-  getProductById,
-  createProduct,
-} = require("../utils/productUtils");
+const { getProductById, createProduct } = require("../utils/productUtils");
 const { findUserById } = require("../utils/userUtils");
+const models = require("../models");
 
 const router = express.Router();
 
 // 상품 목록 조회
-router.get("/", async (req, res) => {
+router.get("/", async (__, res) => {
   try {
-    const productsWithUserID = await getAllProducts();
-
-    // 모든 seller(userID)에 대한 userName 조회 및 중복 제거
-    const uniqueSellerIds = [
-      ...new Set(productsWithUserID.map((p) => p.seller)),
-    ];
-
-    // 유저 정보 한 번에 조회
-    const users = await Promise.all(
-      uniqueSellerIds.map((id) => findUserById(id))
-    );
-
-    // userID -> userName 매핑 객체 생성성
-    const userMap = {};
-    users.forEach((user) => {
-      if (user) userMap[user.userID] = user.userName;
+    const products = await models.Product.findAll({
+      include: [
+        {
+          model: models.User,
+          attributes: ["userName"],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+      attributes: [
+        "productID",
+        "name",
+        "price",
+        "createdAt",
+        "imageUrl",
+        "quantity",
+        "seller",
+      ],
     });
 
-    // 상품의 seller (userID)를 userName으로 변환환
-    const products = productsWithUserID.map((product) => ({
-      ...product.dataValues,
-      seller: userMap[product.seller] || product.seller,
+    const result = products.map((product) => ({
+      productID: product.productID,
+      imageUrl: product.imageUrl,
+      seller: product.User?.userName ?? product.seller,
+      name: product.name,
+      price: product.price,
+      createdAt: product.createdAt,
+      quantity: product.quantity,
     }));
 
-    // 상품 목록 조회 성공
-    res.send({ products });
+    console.log(result);
+
+    res.send({ products: result });
   } catch (error) {
     // 상품 목록 조회 실패
     console.error(error);
