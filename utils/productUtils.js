@@ -1,11 +1,12 @@
 const models = require("../models");
+const { PURCHASE: ERROR_MESSAGES } = require("../constants/errorMessages");
 
 /**
  * 상품 목록 조회 함수
  * @returns {Promise<Array>} 상품 목록
  */
-const getAllProducts = async () => {
-  return await models.Product.findAll({
+const getAllProducts = async () =>
+  await models.Product.findAll({
     order: [["createdAt", "DESC"]],
     attributes: [
       "productID",
@@ -16,25 +17,22 @@ const getAllProducts = async () => {
       "imageUrl",
     ],
   });
-};
 
 /**
  * 상품 조회 함수
  * @param {number} productID - 상품 ID
  * @returns {Promise<Object>} 상품 정보
  */
-const getProductById = async (productID) => {
-  return await models.Product.findOne({ where: { productID } });
-};
+const getProductById = async (productID) =>
+  await models.Product.findOne({ where: { productID } });
 
 /**
  * 상품 생성 함수
  * @param {Object} productData - 상품 데이터
  * @returns {Promise<Object>} 생성된 상품 정보
  */
-const createProduct = async (productData) => {
-  return await models.Product.create(productData);
-};
+const createProduct = async (productData) =>
+  await models.Product.create(productData);
 
 /**
  * 상품 수량 감소 함수

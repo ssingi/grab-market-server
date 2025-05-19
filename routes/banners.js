@@ -1,8 +1,8 @@
 const express = require("express");
 const models = require("../models");
 const router = express.Router();
-const { BANNERS: ERROR_MESSAGES } = require("../constants/errorMessages");
-const STATUS_CODES = require("../constants/statusCodes");
+const { BANNERS: E_MESSAGES } = require("../constants/errorMessages");
+const { SERVER_ERROR: S_E_CODE } = require("../constants/statusCodes");
 
 // 배너 목록 조회
 router.get("/", (req, res) => {
@@ -19,9 +19,7 @@ router.get("/", (req, res) => {
     .catch((error) => {
       // 배너 목록 조회 실패
       console.log(error);
-      res
-        .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-        .send(ERROR_MESSAGES.BANNER_ERROR);
+      res.status(S_E_CODE.INTERNAL_SERVER_ERROR).send(E_MESSAGES.BANNER_ERROR);
     });
 });
 

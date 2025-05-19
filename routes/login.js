@@ -1,11 +1,14 @@
 const express = require("express");
-const { LOGIN: ERROR_MESSAGES } = require("../constants/errorMessages");
-const STATUS_CODES = require("../constants/statusCodes");
+const { LOGIN: E_MESSAGES } = require("../constants/errorMessages");
+const {
+  CLIENT_ERROR: C_E_CODE,
+  SERVER_ERROR: S_E_CODE,
+} = require("../constants/statusCodes");
 const { findUserById, verifyPassword } = require("../utils/userUtils");
 
 const router = express.Router();
 
-// 로그인 라우터터
+// 로그인 라우터
 router.post("/", async (req, res) => {
   try {
     const { userID, password } = req.body;
@@ -14,9 +17,7 @@ router.post("/", async (req, res) => {
     // 사용자 조회
     const user = await findUserById(userID);
     if (!user) {
-      return res
-        .status(STATUS_CODES.UNAUTHORIZED)
-        .send(ERROR_MESSAGES.USER_NOT_FOUND);
+      return res.status(C_E_CODE.UNAUTHORIZED).send(E_MESSAGES.USER_NOT_FOUND);
     }
 
     // 비밀번호 검증
@@ -25,8 +26,8 @@ router.post("/", async (req, res) => {
 
     if (!isValid) {
       return res
-        .status(STATUS_CODES.UNAUTHORIZED)
-        .send(ERROR_MESSAGES.INVALID_PASSWORD);
+        .status(C_E_CODE.UNAUTHORIZED)
+        .send(E_MESSAGES.INVALID_PASSWORD);
     }
 
     // 로그인 성공
@@ -39,9 +40,7 @@ router.post("/", async (req, res) => {
       },
     });
   } catch (error) {
-    res
-      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-      .send(ERROR_MESSAGES.LOGIN_ERROR);
+    res.status(S_E_CODE.INTERNAL_SERVER_ERROR).send(E_MESSAGES.LOGIN_ERROR);
   }
 });
 

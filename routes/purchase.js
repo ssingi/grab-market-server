@@ -1,25 +1,42 @@
 const express = require("express");
-const { PURCHASE: ERROR_MESSAGES } = require("../constants/errorMessages");
-const STATUS_CODES = require("../constants/statusCodes");
+const { PURCHASE: E_MESSAGES } = require("../constants/errorMessages");
+const { CLIENT_ERROR: C_CODES } = require("../constants/statusCodes");
 const {
   getProductById,
   decreaseProductQuantity,
 } = require("../utils/productUtils");
+const models = require("../models");
 
 const router = express.Router();
 
 // 상품 구매
 router.post("/:productID", async (req, res) => {
   const { productID } = req.params;
+  const {
+    userID,
+    quantity = 1,
+    deliveryAddress = " ", // 암시로 공백 넣어놓음
+  } = req.body;
+
+  if (!userID || !deliveryAddress) {
+    return res.status(S_CODE.BAD_REQUEST).send(E_MESSAGES.PURCHASE_ERROR);
+  }
 
   try {
     // 해당 상품 조회
     const product = await getProductById(productID);
     if (!product) {
-      return res
-        .status(STATUS_CODES.NOT_FOUND)
-        .send(ERROR_MESSAGES.PRODUCT_NOT_FOUND);
+      return res.status(C_CODES.NOT_FOUND).send(E_MESSAGES.PRODUCT_NOT_FOUND);
     }
+
+    // 구매 정보 저장
+    await models.Purchase.create({
+      userID,
+      productID,
+      quantity,
+      deliveryAddress,
+      purchaseDate: new Date(),
+    });
 
     // 수량 감소
     const remainingQuantity = await decreaseProductQuantity(product);
@@ -34,14 +51,12 @@ router.post("/:productID", async (req, res) => {
     console.error(error);
 
     // 재고 부족 에러 처리
-    if (error.message === ERROR_MESSAGES.OUT_OF_STOCK) {
-      return res
-        .status(STATUS_CODES.BAD_REQUEST)
-        .send(ERROR_MESSAGES.OUT_OF_STOCK);
+    if (error.message === E_MESSAGES.OUT_OF_STOCK) {
+      return res.status(C_CODES.BAD_REQUEST).send(E_MESSAGES.OUT_OF_STOCK);
     }
 
     // 기타 에러 처리
-    res.status(STATUS_CODES.BAD_REQUEST).send(ERROR_MESSAGES.PURCHASE_ERROR);
+    res.status(C_CODES.BAD_REQUEST).send(E_MESSAGES.PURCHASE_ERROR);
   }
 });
 

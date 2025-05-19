@@ -1,7 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define("User", {
     userID: {
-      // 변경된 속성 이름
       type: DataTypes.STRING(30),
       allowNull: false,
       primaryKey: true,
@@ -20,6 +19,14 @@ module.exports = (sequelize, DataTypes) => {
         len: [5, 50],
       },
     },
+    userName: {
+      type: DataTypes.STRING(30),
+      allowNull: true,
+    },
+    userAddress: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -29,9 +36,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
-    lastLogin: {
-      type: DataTypes.DATE,
-    },
+    lastLogin: { type: DataTypes.DATE },
   });
 
   /*

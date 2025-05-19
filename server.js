@@ -1,29 +1,29 @@
 const express = require("express");
 const models = require("./models");
-const applyMiddleware = require("./middlewares"); // authMiddleware.js 경로 수정
+const applyMiddleware = require("./middlewares");
 
-const registerRoutes = require("./routes/register"); // auth.js 경로 수정
-const productsRoutes = require("./routes/products"); // product.js 경로 수정
-const loginRoutes = require("./routes/login"); // login.js 경로 수정
-const purchaseRoutes = require("./routes/purchase"); // purchase.js 경로 수정
-const bannerRoutes = require("./routes/banners"); // banners.js 경로 수정
+const registerRoutes = require("./routes/register");
+const productsRoutes = require("./routes/products");
+const loginRoutes = require("./routes/login");
+const purchaseRoutes = require("./routes/purchase");
+const bannerRoutes = require("./routes/banners");
 
 const app = express();
 const port = 8080;
 
-applyMiddleware(app); // authMiddleware.js 경로 수정
+applyMiddleware(app);
 
-app.use("/banners", bannerRoutes); // banners.js 경로 수정
-app.use("/login", loginRoutes); // login.js 경로 수정
-app.use("/register", registerRoutes); // register.js 경로 수정
-app.use("/products", productsRoutes); // product.js 경로 수정
-app.use("/purchase", purchaseRoutes); // purchase.js 경로 수정
+app.use("/banners", bannerRoutes);
+app.use("/login", loginRoutes);
+app.use("/register", registerRoutes);
+app.use("/products", productsRoutes);
+app.use("/purchase", purchaseRoutes);
 
 // 서버 실행
 app.listen(port, () => {
   console.log(`서버가 http://localhost:${port} 에서 실행 중입니다.`);
   models.sequelize
-    .sync()
+    .sync({ alter: true })
     .then(() => {
       console.log("DB 연결 성공!");
     })
