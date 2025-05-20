@@ -39,12 +39,18 @@ module.exports = (sequelize, DataTypes) => {
     lastLogin: { type: DataTypes.DATE },
   });
 
-  /*
   User.associate = (models) => {
-    User.hasMany(models.Blog, { foreignKey: "userID" });
-    User.hasMany(models.Product, { foreignKey: "seller" });
+    User.hasMany(models.Blog, {
+      foreignKey: "userID",
+      onDelete: "SET NULL",
+      hooks: true,
+    });
+    User.hasMany(models.Product, {
+      foreignKey: "seller",
+      onDelete: "CASCADE", // 유저 삭제 시 Product도 같이 삭제
+      hooks: true,
+    });
   };
-  */
 
   return User;
 };

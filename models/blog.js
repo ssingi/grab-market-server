@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     userID: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     postAt: {
       type: DataTypes.DATE,
