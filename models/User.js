@@ -50,6 +50,11 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: "CASCADE", // 유저 삭제 시 Product도 같이 삭제
       hooks: true,
     });
+    User.hasMany(models.Purchase, {
+      foreignKey: "userID",
+      onDelete: "CASCADE",
+      hooks: true,
+    });
   };
 
   return User;
