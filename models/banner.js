@@ -1,13 +1,13 @@
-module.exports = function (sequelize, dataTypes) {
-  const banner = sequelize.define("Banner", {
+module.exports = (sequelize, DataTypes) => {
+  const Banner = sequelize.define("Banner", {
     imageUrl: {
-      type: dataTypes.STRING(300),
+      type: DataTypes.STRING(300),
       allowNull: false,
     },
     href: {
-      type: dataTypes.STRING(200),
+      type: DataTypes.STRING(200),
       allowNull: false,
     },
   });
-  return banner;
+  return Banner;
 };

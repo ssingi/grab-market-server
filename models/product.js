@@ -1,5 +1,5 @@
-module.exports = function (sequelize, DataTypes) {
-  const product = sequelize.define("Product", {
+module.exports = (sequelize, DataTypes) => {
+  const Product = sequelize.define("Product", {
     productID: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -38,9 +38,9 @@ module.exports = function (sequelize, DataTypes) {
     },
   });
 
-  product.associate = (models) => {
-    product.belongsTo(models.User, { foreignKey: "seller" });
+  Product.associate = (models) => {
+    Product.belongsTo(models.User, { foreignKey: "seller" });
   };
 
-  return product;
+  return Product;
 };

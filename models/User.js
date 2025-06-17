@@ -36,6 +36,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    lastLogin: { type: DataTypes.DATE },
+
+    // --- User1.js에서 추가된 필드 ---
     isActive: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
@@ -49,9 +52,12 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
     },
     ipAddress: {
-      type: DataTypes.STRING(45),
+      type: DataTypes.STRING(45), // IPv6까지 고려
       allowNull: true,
     },
+    // createdAt은 이미 위에 선언되어 있음
+    // timestamps: true 옵션으로 updatedAt도 자동 생성됨
+    // username은 userID와 userName으로 대체
   });
 
   User.associate = (models) => {

@@ -1,6 +1,8 @@
+require("dotenv").config(); // 이 줄이 반드시 필요합니다!
 const express = require("express");
 const models = require("./models");
 const applyMiddleware = require("./middlewares");
+const cookieParser = require("cookie-parser");
 
 const registerRoutes = require("./routes/register");
 const productsRoutes = require("./routes/products");
@@ -12,11 +14,13 @@ const bannerRoutes = require("./routes/banners");
 const contactRoutes = require("./routes/contact");
 const postRoutes = require("./routes/post");
 const uploadRoutes = require("./routes/upload");
+const authRoutes = require("./routes/auth");
 
 const app = express();
 const port = 8080;
 
 applyMiddleware(app);
+app.use(cookieParser());
 
 app.use("/banners", bannerRoutes);
 app.use("/login", loginRoutes);
@@ -28,6 +32,7 @@ app.use("/purchase", purchaseRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/auth", authRoutes);
 
 // 서버 실행
 app.listen(port, () => {
