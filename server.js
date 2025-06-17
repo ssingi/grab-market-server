@@ -25,9 +25,9 @@ app.use("/products", productsRoutes);
 app.use("/purchase", purchaseRoutes);
 
 // 새로 추가
-app.use("/api/contact", contactRoutes);
-app.use("/api/post", postRoutes);
-app.use("/api/upload", uploadRoutes);
+app.use("/contact", contactRoutes);
+app.use("/post", postRoutes);
+app.use("/upload", uploadRoutes);
 
 // 서버 실행
 app.listen(port, () => {
