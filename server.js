@@ -8,6 +8,11 @@ const loginRoutes = require("./routes/login");
 const purchaseRoutes = require("./routes/purchase");
 const bannerRoutes = require("./routes/banners");
 
+// 새로 추가
+const contactRoutes = require("./routes/contact");
+const postRoutes = require("./routes/post");
+const uploadRoutes = require("./routes/upload");
+
 const app = express();
 const port = 8080;
 
@@ -18,6 +23,11 @@ app.use("/login", loginRoutes);
 app.use("/register", registerRoutes);
 app.use("/products", productsRoutes);
 app.use("/purchase", purchaseRoutes);
+
+// 새로 추가
+app.use("/api/contact", contactRoutes);
+app.use("/api/post", postRoutes);
+app.use("/api/upload", uploadRoutes);
 
 // 서버 실행
 app.listen(port, () => {

@@ -36,7 +36,22 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
-    lastLogin: { type: DataTypes.DATE },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
+    failedLoginAttempts: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
+    lastLoginAttempt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    ipAddress: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
   });
 
   User.associate = (models) => {
