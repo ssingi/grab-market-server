@@ -37,17 +37,16 @@ const createProduct = async (productData) =>
 /**
  * 상품 수량 감소 함수
  * @param {Object} product - 상품 객체
+ * @param {number} decreaseBy - 감소할 수량
  * @returns {Promise<number>} 감소된 상품 수량
- * @throws {Error} 재고가 없는 경우 에러 발생
+ * @throws {Error} 재고가 부족한 경우 에러 발생
  */
-const decreaseProductQuantity = async (product) => {
-  // 재고가 없는 경우 에러 발생
-  if (product.quantity <= 0) {
+const decreaseProductQuantity = async (product, decreaseBy = 1) => {
+  if (product.quantity < decreaseBy) {
     throw new Error(ERROR_MESSAGES.OUT_OF_STOCK);
   }
-  // 수량 감소
-  await product.update({ quantity: product.quantity - 1 });
-  return product.quantity - 1;
+  await product.update({ quantity: product.quantity - decreaseBy });
+  return product.quantity - decreaseBy;
 };
 
 module.exports = {

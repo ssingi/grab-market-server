@@ -39,12 +39,13 @@ router.post("/:productID", async (req, res) => {
     });
 
     // 수량 감소
-    const remainingQuantity = await decreaseProductQuantity(product);
+    const remainingQuantity = await decreaseProductQuantity(product, quantity);
 
     // 구매 성공
     res.send({
       result: true,
-      message: `구매 성공! 남은 수량: ${remainingQuantity}`,
+      message: "구매 성공!",
+      remainingQuantity, // 남은 수량을 별도 필드로 반환
     });
   } catch (error) {
     // 구매 실패
