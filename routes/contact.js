@@ -6,7 +6,6 @@ const {
   CLIENT_ERROR: CE_CODE,
   SERVER_ERROR: SE_CODE,
 } = require("../constants/statusCodes");
-const { REGISTER: E_MESSAGES } = require("../constants/errorMessages");
 
 // 문의 등록
 router.post("/", async (req, res) => {
@@ -20,12 +19,12 @@ router.post("/", async (req, res) => {
 });
 
 // 문의 전체 조회
-router.get("/", async (req, res) => {
+router.get("/", async (_, res) => {
   try {
     const contacts = await models.Contact.findAll({
       order: [["createdAt", "DESC"]],
     });
-    res.json(contacts);
+    res.status(SUC_CODE.OK).json(contacts);
   } catch (error) {
     res.status(SE_CODE.INTERNAL_SERVER_ERROR).json({ message: "서버 오류" });
   }
@@ -40,7 +39,7 @@ router.get("/:id", async (req, res) => {
         .status(CE_CODE.NOT_FOUND)
         .json({ message: "문의가 없습니다." });
     }
-    res.json(contact);
+    res.status(SUC_CODE.OK).json(contact);
   } catch (error) {
     res.status(SE_CODE.INTERNAL_SERVER_ERROR).json({ message: "서버 오류" });
   }
@@ -58,7 +57,9 @@ router.put("/:id", async (req, res) => {
     }
     contact.status = status;
     await contact.save();
-    res.json({ message: "문의 상태가 수정되었습니다.", contact });
+    res
+      .status(SUC_CODE.OK)
+      .json({ message: "문의 상태가 수정되었습니다.", contact });
   } catch (error) {
     res.status(SE_CODE.INTERNAL_SERVER_ERROR).json({ message: "서버 오류" });
   }
