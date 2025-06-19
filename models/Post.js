@@ -19,17 +19,9 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false,
       },
-      fileUrl: {
-        type: DataTypes.JSON, // 여러 파일 URL 저장 시 배열 형태로 사용
-        allowNull: true,
-      },
       views: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
-      },
-      viewLogs: {
-        type: DataTypes.JSON, // [{ip, userAgent, timestamp}, ...]
-        allowNull: true,
       },
     },
     {
@@ -37,6 +29,14 @@ module.exports = (sequelize, DataTypes) => {
       tableName: "Posts",
     }
   );
+
+  Post.associate = (models) => {
+    Post.hasMany(models.PostLog, { foreignKey: "postID", onDelete: "CASCADE" });
+    Post.hasMany(models.PostFile, {
+      foreignKey: "postID",
+      onDelete: "CASCADE",
+    });
+  };
 
   return Post;
 };
