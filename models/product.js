@@ -44,6 +44,7 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "productID",
       onDelete: "SET NULL",
     });
+    Product.hasMany(models.Purchase, { foreignKey: "productID" }); // 추가
   };
 
   return Product;

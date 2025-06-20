@@ -17,4 +17,4 @@ VALUES
 INSERT
 INTO Products
 VALUES
-(1, '농구공', 5000, 'user1', '가벼운 농구공', 3, 'uploads/basketball1.jpeg', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+(1, '농구공', 5000, 'user1', '가벼운 농구공', 10, 'uploads/basketball1.jpeg', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);

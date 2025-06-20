@@ -6,6 +6,7 @@ const {
   decreaseProductQuantity,
 } = require("../utils/productUtils");
 const models = require("../models");
+const { authenticateToken } = require("../middlewares/jwt");
 
 const router = express.Router();
 
@@ -65,7 +66,7 @@ router.post("/:productID", async (req, res) => {
 });
 
 // 구매 목록 조회
-router.get("/", async (req, res) => {
+router.get("/", authenticateToken, async (req, res) => {
   const userID = req.user.userID; // JWT에서 추출
   try {
     const purchases = await models.Purchase.findAll({

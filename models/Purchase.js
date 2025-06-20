@@ -19,12 +19,10 @@ module.exports = (sequelize, DataTypes) => {
     productID: { type: DataTypes.INTEGER, allowNull: false },
   });
 
-  /*
   Purchase.associate = (models) => {
     Purchase.belongsTo(models.User, { foreignKey: "userID" });
     Purchase.belongsTo(models.Product, { foreignKey: "productID" });
   };
-  */
 
   return Purchase;
 };
