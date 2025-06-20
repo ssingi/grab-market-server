@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const models = require("../models");
-const jwt = require("jsonwebtoken");
 const axios = require("axios");
 const { marked } = require("marked");
 const {
@@ -10,25 +9,7 @@ const {
   CLIENT_ERROR,
 } = require("../constants/statusCodes");
 const { deleteS3Files } = require("../utils/postUtils");
-
-// JWT 인증 미들웨어
-const authenticateToken = (req, res, next) => {
-  const token = req.cookies.token;
-  if (!token) {
-    return res
-      .status(CLIENT_ERROR.UNAUTHORIZED)
-      .json({ message: "토큰이 없습니다." });
-  }
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch (error) {
-    return res
-      .status(CLIENT_ERROR.FORBIDDEN)
-      .json({ message: "유효하지 않은 토큰입니다." });
-  }
-};
+const { authenticateToken } = require("../middlewares/jwt");
 
 // 게시글 등록
 router.post("/", authenticateToken, async (req, res) => {
