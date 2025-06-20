@@ -73,7 +73,7 @@ router.get("/", async (_, res) => {
     });
 
     const result = posts.map((post) => ({
-      postID: post.id,
+      postID: post.postID,
       number: post.number,
       title: post.title,
       content: post.content,
