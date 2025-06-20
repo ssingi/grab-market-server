@@ -40,6 +40,10 @@ module.exports = (sequelize, DataTypes) => {
 
   Product.associate = (models) => {
     Product.belongsTo(models.User, { foreignKey: "seller" });
+    Product.hasMany(models.Post, {
+      foreignKey: "productID",
+      onDelete: "SET NULL",
+    });
   };
 
   return Product;

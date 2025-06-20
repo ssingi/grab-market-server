@@ -33,7 +33,7 @@ const authenticateToken = (req, res, next) => {
 // 게시글 등록
 router.post("/", authenticateToken, async (req, res) => {
   try {
-    const { title, content, fileUrl } = req.body;
+    const { title, content, fileUrl, productID } = req.body;
     const latestPost = await models.Post.findOne({
       order: [["number", "DESC"]],
     });
@@ -45,6 +45,7 @@ router.post("/", authenticateToken, async (req, res) => {
       content,
       fileUrl,
       views: 0,
+      productID,
     });
 
     if (Array.isArray(fileUrl)) {
@@ -152,6 +153,7 @@ router.get("/:id", async (req, res) => {
       userID: post.userID,
       fileUrl: post.PostFiles.map((file) => file.fileUrl),
       renderedContent: htmlContent,
+      productID: post.productID,
     };
 
     res.status(SUCCESS.OK).json(responseData);
@@ -165,7 +167,7 @@ router.get("/:id", async (req, res) => {
 // 게시글 수정
 router.put("/:id", authenticateToken, async (req, res) => {
   try {
-    const { title, content, fileUrl } = req.body;
+    const { title, content, fileUrl, productID } = req.body;
     const post = await models.Post.findByPk(req.params.id, {
       include: [
         {
@@ -199,6 +201,7 @@ router.put("/:id", authenticateToken, async (req, res) => {
       title,
       content,
       updatedAt: new Date(),
+      productID,
     });
 
     res.status(SUCCESS.OK).json(post);

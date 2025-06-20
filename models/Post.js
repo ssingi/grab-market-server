@@ -23,6 +23,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
+      productID: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        foreignKey: true,
+      },
     },
     {
       timestamps: true, // createdAt, updatedAt 자동 생성
@@ -35,6 +40,10 @@ module.exports = (sequelize, DataTypes) => {
     Post.hasMany(models.PostFile, {
       foreignKey: "postID",
       onDelete: "CASCADE",
+    });
+    Post.belongsTo(models.Product, {
+      foreignKey: "productID",
+      onDelete: "SET NULL",
     });
   };
 
