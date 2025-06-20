@@ -61,4 +61,19 @@ router.post("/:productID", async (req, res) => {
   }
 });
 
+// 구매 목록 조회
+router.get("/", async (req, res) => {
+  const userID = req.user.userID; // JWT에서 추출
+  try {
+    const purchases = await models.Purchase.findAll({
+      where: { userID },
+      include: [{ model: models.Product }],
+    });
+    const products = purchases.map((p) => p.Product);
+    res.json({ products });
+  } catch (e) {
+    res.status(500).json({ message: "주문 상품 조회 실패" });
+  }
+});
+
 module.exports = router;

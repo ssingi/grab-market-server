@@ -27,6 +27,22 @@ router.post("/:productID", async (req, res) => {
       return res.status(C_CODES.NOT_FOUND).send(E_MESSAGES.PRODUCT_NOT_FOUND);
     }
 
+    const cartItem = await models.ShopCart.findOne({
+      where: { userID, productID },
+    });
+    if (cartItem) {
+      // 이미 장바구니에 있는 상품이면 수량만 증가
+      await cartItem.increment(
+        "quantity",
+        { where: { userID, productID } },
+        { by: quantity }
+      );
+      return res.status(S_CODES.OK).send({
+        result: true,
+        message: "이미 장바구니에 있는 상품입니다. 수량이 증가했습니다.",
+      });
+    }
+
     // 상품 정보 저장
     await models.ShopCart.create({ userID, productID, quantity });
 
