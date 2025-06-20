@@ -47,6 +47,9 @@ router.post("/:productID", async (req, res) => {
       message: "구매 성공!",
       remainingQuantity, // 남은 수량을 별도 필드로 반환
     });
+
+    // 장바구니에서 해당 상품 제거
+    await models.ShopCart.destroy({ where: { userID, productID } });
   } catch (error) {
     // 구매 실패
     console.error(error);
