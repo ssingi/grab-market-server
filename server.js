@@ -15,6 +15,7 @@ const contactRoutes = require("./routes/contact");
 const postRoutes = require("./routes/post");
 const uploadRoutes = require("./routes/upload");
 const authRoutes = require("./routes/auth");
+const shopCartRoutes = require("./routes/shopCart"); // 추가
 
 const app = express();
 const port = 8080;
@@ -33,6 +34,7 @@ app.use("/api/contact", contactRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/shopCart", shopCartRoutes); // 아래 줄 추가
 
 // 서버 실행
 app.listen(port, () => {

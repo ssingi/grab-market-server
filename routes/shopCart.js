@@ -43,19 +43,14 @@ router.post("/:productID", async (req, res) => {
   }
 });
 
-// 장바구니 목록 불러오기
+// 장바구니 목록 불러오기 (userID를 쿼리로도 지원)
 router.get("/", async (req, res) => {
-  const { userID } = req.body;
+  const userID = req.query.userID || req.body.userID;
   try {
-    // 해당 상품 조회
     const products = await models.ShopCart.findAll({ where: { userID } });
-
     res.status(S_CODES.OK).json(products);
   } catch (error) {
-    // 구매 실패
     console.error(error);
-
-    // 기타 에러 처리
     res.status(C_CODES.BAD_REQUEST).send(E_MESSAGES.PURCHASE_ERROR);
   }
 });
